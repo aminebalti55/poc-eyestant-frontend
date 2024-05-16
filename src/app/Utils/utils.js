@@ -1,81 +1,62 @@
-import Peer from 'simple-peer';
 import io from 'socket.io-client';
 
 const socket = io('http://localhost:3001');
 
-
-
 export const generateRoomId = () => {
-  const roomIdLength = 8; 
+  const roomIdLength = 8;
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let roomId = '';
-
   for (let i = 0; i < roomIdLength; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     roomId += characters.charAt(randomIndex);
   }
-
   return roomId;
 };
 
 export const connectPeers = async (roomId, isInitiator, stream) => {
   try {
-    const peer = new Peer({
-      initiator: isInitiator,
-      trickle: false,
-      config: {
-        iceServers: [
-          {
-            urls: 'stun:stun.l.google.com:19302',
-          },
-
-        ],
-      },
+    const peerConnection = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: 'stun:stun.l.google.com:19302',
+        },
+      ],
     });
 
-    peer.addStream(stream);
-
-    peer.on('stream', (remoteStream) => {
-      const remoteVideo = document.getElementById('remote-video');
-
-      console.log(remoteVideo)
-      remoteVideo.srcObject = remoteStream;
+    stream.getTracks().forEach((track) => {
+      peerConnection.addTrack(track, stream);
     });
 
-    peer.on('signal', (signal) => {
-      sendSignalToRemotePeer(signal, roomId);
-    });
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        sendICECandidateToRemotePeer(event.candidate, roomId);
+      }
+    };
 
-    peer.on('icecandidate', (candidate) => {
-      sendICECandidateToRemotePeer(candidate, roomId);
-    });
+    peerConnection.ontrack = (event) => {
+      console.log('Remote stream received');
+      window.dispatchEvent(new CustomEvent('remoteStreamReceived', { detail: { stream: event.streams[0], peerConnection } }));
+    };
 
     if (isInitiator) {
-
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
       socket.emit('join-room', roomId);
-
-      socket.on('signal', ({ senderId, signal }) => {
-        if (senderId !== socket.id) {
-          peer.signal(signal);
-        }
-      });
-
-      socket.on('ice-candidate', ({ senderId, candidate }) => {
-        if (senderId !== socket.id) {
-          peer.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-      });
+      sendSignalToRemotePeer(offer, roomId);
     } else {
-
-      const remoteSignal = await getRemoteSignal(roomId);
-      peer.signal(remoteSignal);
+      const offer = await getRemoteOffer(roomId);
+      await peerConnection.setRemoteDescription(offer);
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      sendSignalToRemotePeer(answer, roomId);
     }
 
-    return peer;
+    return peerConnection;
   } catch (error) {
     console.error('Error connecting peers:', error);
   }
 };
+
 
 const sendSignalToRemotePeer = (signal, roomId) => {
   console.log('Sending signal to remote peer:', signal, 'for room:', roomId);
@@ -87,21 +68,15 @@ const sendICECandidateToRemotePeer = (candidate, roomId) => {
   socket.emit('ice-candidate', { roomId, candidate });
 };
 
-let remoteSignal = null;
-const getRemoteSignal = async (roomId) => {
-  console.log('Getting remote signal for room:', roomId);
+let remoteOffer = null;
+const getRemoteOffer = async (roomId) => {
+  console.log('Getting remote offer for room:', roomId);
   return new Promise((resolve) => {
     socket.on('signal', ({ senderId, signal }) => {
-      if (senderId !== socket.id) {
-        remoteSignal = signal;
-        resolve(remoteSignal);
+      if (senderId !== socket.id && signal.type === 'offer') {
+        remoteOffer = signal;
+        resolve(remoteOffer);
       }
     });
   });
-};
-
-export const handleICECandidateEvent = (event, peer) => {
-  if (event.candidate) {
-    peer.signal({ candidate: event.candidate });
-  }
 };

@@ -64,16 +64,15 @@ export default function VideoRoomClient({ roomId: initialRoomId }) {
           audio: { deviceId: selectedMicrophone ? { exact: selectedMicrophone } : undefined },
           video: { deviceId: selectedCamera ? { exact: selectedCamera } : undefined },
         };
-        console.log('Media constraints:', constraints); 
+        console.log('Media constraints:', constraints);
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         console.log('Local stream obtained:', stream);
         localStream.current = stream;
-        const newPeer = await connectPeers(roomId, true, stream);
-        console.log('New peer connected:', newPeer); 
-        setPeer(newPeer);
-        newPeer.on('icecandidate', (event) => handleICECandidateEvent(event, newPeer));
+        const peerConnection = await connectPeers(roomId, true, stream);
+        console.log('New peer connection established:', peerConnection);
+        setPeer(peerConnection);
         setIsRoomJoined(true);
-        console.log('Room joined successfully.'); 
+        console.log('Room joined successfully.');
         setShowDeviceSelection(false);
         console.log('Device selection UI hidden.');
       } catch (error) {
@@ -83,22 +82,21 @@ export default function VideoRoomClient({ roomId: initialRoomId }) {
     [roomId]
   );
 
-
-  const leaveRoom = useCallback(() => {
-    if (peer) {
-      peer.destroy();
-      setPeer(null);
-    }
-    if (localStream.current) {
-      localStream.current.getTracks().forEach((track) => track.stop());
-      localStream.current = null;
-    }
-    if (screenSharingStream.current) {
-      screenSharingStream.current.getTracks().forEach((track) => track.stop());
-      screenSharingStream.current = null;
-    }
-    setIsRoomJoined(false);
-  }, [peer]);
+ const leaveRoom = useCallback(() => {
+  if (peer) {
+    peer.close();
+    setPeer(null);
+  }
+  if (localStream.current) {
+    localStream.current.getTracks().forEach((track) => track.stop());
+    localStream.current = null;
+  }
+  if (screenSharingStream.current) {
+    screenSharingStream.current.getTracks().forEach((track) => track.stop());
+    screenSharingStream.current = null;
+  }
+  setIsRoomJoined(false);
+}, [peer]);
 
   const sendMessage = (message) => {
     if (message.trim()) {
