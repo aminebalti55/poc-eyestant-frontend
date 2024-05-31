@@ -1,16 +1,15 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from 'react';
 import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
-import { BsPerson, BsMicMuteFill, BsMicMute, BsCameraVideo, BsCameraVideoOff, BsTelephoneXFill } from "react-icons/bs";
-import { CiMinimize1, CiMaximize1 } from "react-icons/ci";
+import { BsMicMuteFill, BsMicMute, BsCameraVideo, BsCameraVideoOff, BsTelephoneXFill } from "react-icons/bs";
 import Button from '@/app/Design/Button';
 import VideoContainer from '@/app/Design/VideoContainer';
 
-const VideoChat = ({ roomId, peer, remoteVideoRef, localStream, leaveRoom, isScreenSharing, toggleScreenShare, screenSharingStream }) => {
+const VideoChat = ({ roomId, peer, localStream, leaveRoom, isScreenSharing, toggleScreenShare, screenSharingStream }) => {
   const localVideoRef = useRef(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
-  const [showIcons, setShowIcons] = useState(false);
-  const [isMainVideoMaximized, setIsMainVideoMaximized] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState([]);
 
   useEffect(() => {
@@ -21,14 +20,17 @@ const VideoChat = ({ roomId, peer, remoteVideoRef, localStream, leaveRoom, isScr
         localVideoRef.current.srcObject = localStream.current;
       }
     }
-  }, [isScreenSharing, localStream, screenSharingStream, localVideoRef]);
+  }, [isScreenSharing, localStream, screenSharingStream]);
 
   useEffect(() => {
     const handleRemoteStreamReceived = (event) => {
-      const remoteStream = event.detail;
-      if (remoteStream !== localStream.current) {
-        setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
-      }
+      const remoteStream = event.detail.stream;
+      setRemoteStreams((prevStreams) => {
+        if (!prevStreams.includes(remoteStream)) {
+          return [...prevStreams, remoteStream];
+        }
+        return prevStreams;
+      });
     };
 
     window.addEventListener('remoteStreamReceived', handleRemoteStreamReceived);
@@ -36,16 +38,19 @@ const VideoChat = ({ roomId, peer, remoteVideoRef, localStream, leaveRoom, isScr
     if (peer) {
       peer.ontrack = (event) => {
         const remoteStream = event.streams[0];
-        if (remoteStream !== localStream.current) {
-          setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
-        }
+        setRemoteStreams((prevStreams) => {
+          if (!prevStreams.includes(remoteStream)) {
+            return [...prevStreams, remoteStream];
+          }
+          return prevStreams;
+        });
       };
     }
 
     return () => {
       window.removeEventListener('remoteStreamReceived', handleRemoteStreamReceived);
     };
-  }, [peer, localStream]);
+  }, [peer]);
 
   const toggleMic = () => {
     localStream.current.getAudioTracks().forEach((track) => {
@@ -61,57 +66,16 @@ const VideoChat = ({ roomId, peer, remoteVideoRef, localStream, leaveRoom, isScr
     setIsCameraOn(!isCameraOn);
   };
 
-  const handleMouseEnter = () => {
-    setShowIcons(true);
-  };
-
-  const handleMouseLeave = () => {
-    setShowIcons(false);
-  };
-
-  const toggleMainVideoSize = () => {
-    setIsMainVideoMaximized(!isMainVideoMaximized);
-  };
-
   return (
-    <div className={`grid ${isMainVideoMaximized ? 'md:grid-cols-4' : 'md:grid-cols-2'} gap-4 h-full`}>
+    <div className="relative h-full">
       <VideoContainer
-        srcObject={remoteStreams.length > 0 ? remoteStreams[0] : localStream.current}
-        isMain={isMainVideoMaximized}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {showIcons && (
-          <div className="absolute bottom-4 right-4 flex space-x-2">
-            <Button onClick={toggleMainVideoSize}>
-              {isMainVideoMaximized ? <CiMinimize1 size={20} /> : <CiMaximize1 size={20} />}
-            </Button>
-            <Button onClick={toggleScreenShare}>
-              {isScreenSharing ? <LuScreenShareOff size={20} /> : <LuScreenShare size={20} />}
-            </Button>
-            <Button onClick={toggleMic}>
-              {isMicOn ? <BsMicMuteFill size={20} /> : <BsMicMute size={20} />}
-            </Button>
-            <Button onClick={toggleCamera}>
-              {isCameraOn ? <BsCameraVideo size={20} /> : <BsCameraVideoOff size={20} />}
-            </Button>
-            <Button onClick={leaveRoom} className="bg-red-500 hover:bg-red-600">
-              <BsTelephoneXFill size={20} />
-            </Button>
-          </div>
-        )}
-      </VideoContainer>
-      <div className={`${isMainVideoMaximized ? 'md:col-span-1 grid grid-cols-1 grid-rows-2 gap-4' : 'md:col-span-1 aspect-video'} bg-gray-200 rounded-lg overflow-hidden shadow-lg`}>
-        {remoteStreams.length > 1 ? (
-          remoteStreams.slice(1).map((remoteStream, index) => (
-            <VideoContainer key={index} srcObject={remoteStream} />
-          ))
-        ) : (
-          <div className="flex items-center justify-center w-full h-full">
-            <BsPerson size={48} className="text-gray-400" />
-          </div>
-        )}
-      </div>
+        srcObject={localStream.current}
+      />
+      {remoteStreams.map((remoteStream, index) => (
+        <div key={index} className="absolute bottom-0 left-0 w-40 h-40">
+          <VideoContainer srcObject={remoteStream} />
+        </div>
+      ))}
     </div>
   );
 };

@@ -1,0 +1,10 @@
+
+.chat {
+    max-height: 500px;
+  }
+  
+  .chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  

@@ -1,3 +1,6 @@
+'use client';
+
+
 import VideoRoomClient from '../components/VideoRoomClient';
 
 export default function VideoRoom({ params }) {

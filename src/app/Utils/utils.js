@@ -34,8 +34,7 @@ export const connectPeers = async (roomId, isInitiator, stream) => {
     };
 
     peerConnection.ontrack = (event) => {
-      console.log('Remote stream received');
-      window.dispatchEvent(new CustomEvent('remoteStreamReceived', { detail: { stream: event.streams[0], peerConnection } }));
+      window.dispatchEvent(new CustomEvent('remoteStreamReceived', { detail: { stream: event.streams[0] } }));
     };
 
     if (isInitiator) {
@@ -51,31 +50,42 @@ export const connectPeers = async (roomId, isInitiator, stream) => {
       sendSignalToRemotePeer(answer, roomId);
     }
 
+    socket.on('signal', async ({ senderId, signal }) => {
+      if (signal.type === 'offer' && !isInitiator) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        sendSignalToRemotePeer(answer, roomId);
+      } else if (signal.type === 'answer' && isInitiator) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+      } else if (signal.candidate) {
+        try {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(signal.candidate));
+        } catch (error) {
+          console.error('Error adding received ice candidate', error);
+        }
+      }
+    });
+
     return peerConnection;
   } catch (error) {
     console.error('Error connecting peers:', error);
   }
 };
 
-
 const sendSignalToRemotePeer = (signal, roomId) => {
-  console.log('Sending signal to remote peer:', signal, 'for room:', roomId);
   socket.emit('signal', { roomId, signal });
 };
 
 const sendICECandidateToRemotePeer = (candidate, roomId) => {
-  console.log('Sending ICE candidate to remote peer:', candidate, 'for room:', roomId);
   socket.emit('ice-candidate', { roomId, candidate });
 };
 
-let remoteOffer = null;
 const getRemoteOffer = async (roomId) => {
-  console.log('Getting remote offer for room:', roomId);
   return new Promise((resolve) => {
-    socket.on('signal', ({ senderId, signal }) => {
-      if (senderId !== socket.id && signal.type === 'offer') {
-        remoteOffer = signal;
-        resolve(remoteOffer);
+    socket.once('signal', ({ signal }) => {
+      if (signal.type === 'offer') {
+        resolve(signal);
       }
     });
   });
