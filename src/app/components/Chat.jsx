@@ -32,7 +32,7 @@ const Chat = ({ chatMessages, sendMessage, username }) => {
   return (
     <div className="chat bg-white p-4 rounded-lg shadow-lg h-full flex flex-col">
       <h2 className="text-lg font-semibold mb-4 text-[#2B3674]">Chat</h2>
-      <div className="chat-messages mb-4 flex-grow overflow-y-auto pr-2">
+      <div className=" h-auto max-h-50 mb-4 flex-grow overflow-auto pr-2">
         {chatMessages.map((message, index) => (
           <div key={index} className="mb-4">
             <div className="text-xs text-gray-500 mb-1">
