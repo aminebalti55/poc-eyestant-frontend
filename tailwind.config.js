@@ -7,6 +7,23 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        'light-bg': '#ffffff',
+        'light-text': '#424242',
+        'light-icon': '#422afb',
+        'light-circle': '#f4f7fe',
+        'dark-bg': '#0b1437',
+        'dark-card-bg': '#111c44',
+        'dark-text': '#ffffff',
+        'dark-icon': '#ffffff',
+        'dark-circle': '#1b254b',
+        'dark-subtext': '#a3aed0',
+        'dark-sidebar-bg': '#111c44',
+        'dark-sidebar-text': '#ffffff',
+        'light-sidebar-bg': '#ffffff',
+        'light-sidebar-text': '#424242',
+        'custom-blue': '#4318FF', // Added custom blue color
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -15,4 +32,5 @@ module.exports = {
     },
   },
   plugins: [],
+  darkMode: 'class', // Enable class-based dark mode
 };
