@@ -22,7 +22,7 @@ module.exports = {
         'dark-sidebar-text': '#ffffff',
         'light-sidebar-bg': '#ffffff',
         'light-sidebar-text': '#424242',
-        'custom-blue': '#4318FF', // Added custom blue color
+        'custom-blue': '#4318FF', 
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -32,5 +32,5 @@ module.exports = {
     },
   },
   plugins: [],
-  darkMode: 'class', // Enable class-based dark mode
+  darkMode: 'class', 
 };
