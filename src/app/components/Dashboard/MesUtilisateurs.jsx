@@ -15,7 +15,6 @@ const columnHelper = createColumnHelper();
 const MesUtilisateurs = ({ isDarkMode, title }) => {
   const [data, setData] = useState([
     { nom: 'NOM', poste: 'Agent X', departement: 'Département X', email: 'NOM@COMPANY.COM' },
-    // Add more data as needed
   ]);
 
   const [sorting, setSorting] = useState([]);
