@@ -1,13 +1,15 @@
 'use client';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { MdDashboard, MdPeople, MdDescription, MdCall, MdHelp, MdSettings, MdLogout } from 'react-icons/md';
 
-const Sidebar = ({ isDarkMode }) => {
+const Sidebar = ({ isDarkMode, setSelectedTab }) => {
   const [selected, setSelected] = useState('dashboard');
 
   const handleSelect = (item) => {
     setSelected(item);
+    setSelectedTab(item);
   };
 
   const menuItems = [
