@@ -9,7 +9,7 @@ import Statistics from '@/app/components/Dashboard/Charts/Statistics';
 import DocumentsPartages from '@/app/components/Dashboard/Charts/DocumentsPartages';
 import MonEquipe from '@/app/components/Dashboard/MonEquipe';
 import ParametresSecurite from '@/app/components/Dashboard/ParametresSecurite';
-import MesUtilisateurs from '@/app/components/Dashboard/MesUtilisateurs';
+import UserTable from '@/app/components/Organisms/UserTable';
 import UserStat from '@/app/components/Dashboard/UserStat';
 
 const Dashboard = () => {
@@ -41,8 +41,8 @@ const Dashboard = () => {
         return (
           <div className="flex flex-col space-y-8">
             <div className="flex space-x-4">
-              <MesUtilisateurs isDarkMode={isDarkMode} title="Superviseurs" />
-              <MesUtilisateurs isDarkMode={isDarkMode} title="Utilisateurs" />
+              <UserTable isDarkMode={isDarkMode} title="Superviseurs" />
+              <UserTable isDarkMode={isDarkMode} title="Utilisateurs" />
             </div>
             <UserStat isDarkMode={isDarkMode} />
           </div>

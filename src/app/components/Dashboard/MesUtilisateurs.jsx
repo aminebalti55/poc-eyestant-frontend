@@ -9,7 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import Modal from './Modal';
+import Modal from '../Atoms/Modal';
 
 const columnHelper = createColumnHelper();
 
