@@ -9,6 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import Modal from './Modal';
 
 const columnHelper = createColumnHelper();
 
@@ -18,11 +19,16 @@ const MesUtilisateurs = ({ isDarkMode, title }) => {
   ]);
 
   const [sorting, setSorting] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDelete = (index) => {
     const newData = [...data];
     newData.splice(index, 1);
     setData(newData);
+  };
+
+  const handleAdd = (newData) => {
+    setData([...data, newData]);
   };
 
   const columns = [
@@ -66,15 +72,7 @@ const MesUtilisateurs = ({ isDarkMode, title }) => {
         </p>
       ),
     }),
-    columnHelper.display({
-      id: 'actions',
-      header: () => <span></span>,
-      cell: (info) => (
-        <div className="flex justify-end space-x-2 pr-8">
-          
-        </div>
-      ),
-    }),
+
   ];
 
   const table = useReactTable({
@@ -92,7 +90,10 @@ const MesUtilisateurs = ({ isDarkMode, title }) => {
         <div className="text-lg font-bold text-navy-700 dark:text-white">
           {title}
         </div>
-        <button className={`rounded-full p-1 ${isDarkMode ? 'bg-dark-circle text-white' : 'bg-light-circle text-custom-blue'}`}>
+        <button 
+          className={`rounded-full p-1 ${isDarkMode ? 'bg-dark-circle text-white' : 'bg-light-circle text-custom-blue'}`}
+          onClick={() => setIsModalOpen(true)}
+        >
           <FaPlus size={12} />
         </button>
       </header>
@@ -141,6 +142,11 @@ const MesUtilisateurs = ({ isDarkMode, title }) => {
           </tbody>
         </table>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleAdd}
+      />
     </div>
   );
 };

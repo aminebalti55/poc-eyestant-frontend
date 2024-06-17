@@ -16,7 +16,7 @@ const StatistiqueCard = ({ appels, isDarkMode }) => (
 );
 
 const StatistiquesContainer = ({ title, statistiques, isDarkMode }) => (
-  <div className={`p-4 rounded-lg flex-1 m-2 shadow-sm w-full max-w-2xl ${isDarkMode ? 'bg-[#111C44]' : 'bg-light-bg'}`}>
+  <div className={`p-4 rounded-lg shadow-sm w-full max-w-2xl ${isDarkMode ? 'bg-[#111C44]' : 'bg-light-bg'}`}>
     <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-dark-text' : 'text-navy-700'}`}>{title}</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {statistiques.map((stat, index) => (
@@ -35,7 +35,7 @@ const UserStat = ({ isDarkMode }) => {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-8 justify-center">
+    <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-8 justify-center items-stretch">
       <StatistiquesContainer title="Statistiques du superviseur" statistiques={statistiques} isDarkMode={isDarkMode} />
       <StatistiquesContainer title="Statistiques de l'utilisateur" statistiques={statistiques} isDarkMode={isDarkMode} />
     </div>
