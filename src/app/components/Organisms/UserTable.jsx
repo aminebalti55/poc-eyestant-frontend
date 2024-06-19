@@ -53,16 +53,18 @@ const columns = [
 ];
 
 const UserTable = ({ isDarkMode, title }) => {
-  const { data, handleAdd, handleDelete } = useCrud([
+  const { data, handleAdd, handleEdit, handleDelete } = useCrud([
     { nom: 'NOM', poste: 'Agent X', departement: 'Département X', email: 'NOM@COMPANY.COM' },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [formData, setFormData] = useState({
     nom: '',
     poste: '',
     departement: '',
     email: '',
   });
+  const [currentIndex, setCurrentIndex] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -72,9 +74,26 @@ const UserTable = ({ isDarkMode, title }) => {
   };
 
   const handleSave = () => {
-    handleAdd(formData);
+    if (isEdit) {
+      handleEdit(currentIndex, formData);
+    } else {
+      handleAdd(formData);
+    }
     setFormData({ nom: '', poste: '', departement: '', email: '' });
     setIsModalOpen(false);
+  };
+
+  const handleEditClick = (index) => {
+    setCurrentIndex(index);
+    setFormData(data[index]);
+    setIsEdit(true);
+    setIsModalOpen(true);
+  };
+
+  const handleAddClick = () => {
+    setIsEdit(false);
+    setFormData({ nom: '', poste: '', departement: '', email: '' });
+    setIsModalOpen(true);
   };
 
   return (
@@ -86,16 +105,17 @@ const UserTable = ({ isDarkMode, title }) => {
         <IconButton 
           icon="plus"
           className={isDarkMode ? 'bg-dark-circle text-white' : 'bg-light-circle text-custom-blue'}
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleAddClick}
         />
       </header>
-      <Table data={data} columns={columns} onDelete={handleDelete} />
+      <Table data={data} columns={columns} onEdit={handleEditClick} onDelete={handleDelete} />
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
         formData={formData}
         handleChange={handleChange}
+        isEdit={isEdit}
       />
     </div>
   );

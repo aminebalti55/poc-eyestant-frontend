@@ -12,7 +12,7 @@ import TableRowActions from '../Molecules/TableRowActions';
 
 const columnHelper = createColumnHelper();
 
-const Table = ({ data, columns, onDelete }) => {
+const Table = ({ data, columns, onEdit, onDelete }) => {
   const [sorting, setSorting] = React.useState([]);
 
   const table = useReactTable({
@@ -24,8 +24,33 @@ const Table = ({ data, columns, onDelete }) => {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const customScrollbarStyle = {
+    maxHeight: '9rem', 
+    overflowY: 'auto',
+    scrollbarWidth: 'thin',
+    scrollbarColor: '#422afb #f1f1f1',
+  };
+
+  const customScrollbarWebkitStyle = `
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #422afb;
+      border-radius: 10px 10px 5px 5px; 
+      border: 2px solid #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #422afb;
+    }
+  `;
+
   return (
-    <div className="mt-8 max-h-96 overflow-auto">
+    <div style={customScrollbarStyle} className="mt-8">
+      <style>{customScrollbarWebkitStyle}</style>
       <table className="w-full table-fixed">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -57,7 +82,7 @@ const Table = ({ data, columns, onDelete }) => {
                 </td>
               ))}
               <td className="border-white/0 py-2 pr-4">
-                <TableRowActions onDelete={onDelete} index={row.index} />
+                <TableRowActions onEdit={onEdit} onDelete={onDelete} index={row.index} />
               </td>
             </tr>
           ))}

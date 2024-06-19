@@ -7,6 +7,12 @@ export const useCrud = (initialData) => {
     setData([...data, newData]);
   };
 
+  const handleEdit = (index, updatedData) => {
+    const newData = [...data];
+    newData[index] = updatedData;
+    setData(newData);
+  };
+
   const handleDelete = (index) => {
     const newData = [...data];
     newData.splice(index, 1);
@@ -16,6 +22,7 @@ export const useCrud = (initialData) => {
   return {
     data,
     handleAdd,
+    handleEdit,
     handleDelete,
   };
 };
