@@ -11,6 +11,8 @@ import MonEquipe from '@/app/components/Dashboard/MonEquipe';
 import ParametresSecurite from '@/app/components/Dashboard/ParametresSecurite';
 import UserTable from '@/app/components/Organisms/UserTable';
 import UserStat from '@/app/components/Dashboard/UserStat';
+import MesAppels from '@/app/components/Dashboard/MesAppels';
+import Log from '@/app/components/Dashboard/Log';
 
 const Dashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -41,8 +43,8 @@ const Dashboard = () => {
         return (
           <div className="flex flex-col space-y-8">
             <div className="flex space-x-4">
-              <UserTable isDarkMode={isDarkMode} title="Superviseurs" />
-              <UserTable isDarkMode={isDarkMode} title="Utilisateurs" />
+              <UserTable isDarkMode={isDarkMode} title="Superviseurs" hasActions />
+              <UserTable isDarkMode={isDarkMode} title="Utilisateurs" hasActions />
             </div>
             <UserStat isDarkMode={isDarkMode} />
           </div>
@@ -50,7 +52,12 @@ const Dashboard = () => {
       case 'documents':
         return <div>Mes documents content</div>;
       case 'calls':
-        return <div>Mes appels content</div>;
+        return (
+          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <MesAppels />
+            <Log />
+          </div>
+        );
       case 'help':
         return <div>Centre d'aide content</div>;
       case 'settings':

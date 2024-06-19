@@ -1,56 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import IconButton from '../Atoms/IconButton';
 import Modal from '../Atoms/Modal';
-import Table from './Table';
+import TableRowActions from '../Molecules/TableRowActions';
 import { useCrud } from '../../hooks/useCrud';
 
 const columnHelper = createColumnHelper();
-
-const columns = [
-  columnHelper.accessor('nom', {
-    header: () => (
-      <p className="text-[10px] font-bold text-gray-600 dark:text-white">NOM</p>
-    ),
-    cell: (info) => (
-      <p className="text-[10px] font-bold text-navy-700 dark:text-white">
-        {info.getValue()}
-      </p>
-    ),
-  }),
-  columnHelper.accessor('poste', {
-    header: () => (
-      <p className="text-[10px] font-bold text-gray-600 dark:text-white">POSTE</p>
-    ),
-    cell: (info) => (
-      <p className="text-[10px] font-bold text-navy-700 dark:text-white">
-        {info.getValue()}
-      </p>
-    ),
-  }),
-  columnHelper.accessor('departement', {
-    header: () => (
-      <p className="text-[10px] font-bold text-gray-600 dark:text-white">DEPARTEMENT</p>
-    ),
-    cell: (info) => (
-      <p className="text-[10px] font-bold text-navy-700 dark:text-white">
-        {info.getValue()}
-      </p>
-    ),
-  }),
-  columnHelper.accessor('email', {
-    header: () => (
-      <p className="text-[10px] font-bold text-gray-600 dark:text-white">E-MAIL</p>
-    ),
-    cell: (info) => (
-      <p className="text-[10px] font-bold text-navy-700 dark:text-white">
-        {info.getValue()}
-      </p>
-    ),
-  }),
-];
 
 const UserTable = ({ isDarkMode, title }) => {
   const { data, handleAdd, handleEdit, handleDelete } = useCrud([
@@ -65,6 +22,25 @@ const UserTable = ({ isDarkMode, title }) => {
     email: '',
   });
   const [currentIndex, setCurrentIndex] = useState(null);
+
+  const columns = [
+    columnHelper.accessor('nom', {
+      header: () => <span className="text-xs">NOM</span>,
+      cell: info => <span className="text-xs">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('poste', {
+      header: () => <span className="text-xs">POSTE</span>,
+      cell: info => <span className="text-xs">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('departement', {
+      header: () => <span className="text-xs">DEPARTEMENT</span>,
+      cell: info => <span className="text-xs">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('email', {
+      header: () => <span className="text-xs">E-MAIL</span>,
+      cell: info => <span className="text-xs">{info.getValue()}</span>,
+    }),
+  ];
 
   const handleChange = (e) => {
     setFormData({
@@ -96,6 +72,12 @@ const UserTable = ({ isDarkMode, title }) => {
     setIsModalOpen(true);
   };
 
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <div className={`w-full p-4 rounded-lg ${isDarkMode ? 'bg-dark-card-bg text-dark-text' : 'bg-white text-light-text'} flex-1`}>
       <header className="relative flex items-center justify-between mb-4">
@@ -108,7 +90,46 @@ const UserTable = ({ isDarkMode, title }) => {
           onClick={handleAddClick}
         />
       </header>
-      <Table data={data} columns={columns} onEdit={handleEditClick} onDelete={handleDelete} />
+      <div className="overflow-x-auto">
+        <table className="w-full table-fixed">
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id} className="!border-px !border-gray-400">
+                {headerGroup.headers.map(header => (
+                  <th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className="cursor-pointer border-b border-gray-200 pb-2 pr-4 pt-4 text-start dark:border-white/30"
+                  >
+                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-white">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </div>
+                  </th>
+                ))}
+                <th className="border-b border-gray-200 pb-2 pr-4 pt-4 text-start dark:border-white/30">
+                  <div className="flex items-center justify-between text-xs text-gray-600 dark:text-white">
+                    ACTIONS
+                  </div>
+                </th>
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map(row => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <td key={cell.id} className="border-white/0 py-2 pr-4 text-xs">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+                <td className="border-white/0 py-2 pr-4 text-xs">
+                  <TableRowActions onEdit={() => handleEditClick(row.index)} onDelete={() => handleDelete(row.index)} index={row.index} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
