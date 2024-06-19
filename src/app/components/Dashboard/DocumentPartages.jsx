@@ -30,9 +30,10 @@ const data = [
   { nom: 'NOM', duree: '10s' },
   { nom: 'NOM', duree: '10s' },
   { nom: 'NOM', duree: '10s' },
+  // Add more entries if needed
 ];
 
-const DocumentPartages = () => {
+const DocumentPartages = ({ isDarkMode }) => {
   const table = useReactTable({
     data,
     columns,
@@ -40,8 +41,8 @@ const DocumentPartages = () => {
   });
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md w-full mt-4">
-      <h2 className="text-md font-bold mb-2 text-navy-700">Documents partagés ( x )</h2>
+    <div className={`p-4 ${isDarkMode ? 'bg-dark-card-bg text-dark-text' : 'bg-light-bg text-light-text'} rounded-lg shadow-md w-full mt-4`}>
+      <h2 className="text-md font-bold mb-2 text-navy-700 dark:text-white">Documents partagés ( x )</h2>
       <div className="flex flex-col md:flex-row justify-between">
         <div className="md:w-1/2" style={{ maxHeight: '20rem', overflowY: 'auto' }}>
           <table className="w-full table-fixed">

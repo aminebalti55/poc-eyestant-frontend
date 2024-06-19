@@ -41,7 +41,7 @@ const data = [
   { nom: 'NOM', duree: '50s', date: '15 Fev 2024', heure: '11:05', numero: '+216 22 222 XXX' },
 ];
 
-const MesAppels = () => {
+const MesAppels = ({ isDarkMode }) => {
   const table = useReactTable({
     data,
     columns,
@@ -50,7 +50,7 @@ const MesAppels = () => {
   });
 
   const customScrollbarStyle = {
-    maxHeight: '20rem',
+    maxHeight: '9rem',
     overflowY: 'auto',
     scrollbarWidth: 'thin',
     scrollbarColor: '#422afb #f1f1f1',
@@ -74,9 +74,9 @@ const MesAppels = () => {
   `;
 
   return (
-    <div className="p-2 bg-white rounded-lg shadow-md w-full md:w-1/2">
+    <div className={`p-2 ${isDarkMode ? 'bg-dark-card-bg text-dark-text' : 'bg-light-bg text-light-text'} rounded-lg shadow-md w-full md:w-1/2`}>
       <style>{customScrollbarWebkitStyle}</style>
-      <h2 className="text-md font-bold mb-2 text-navy-700">Appels</h2>
+      <h2 className="text-md font-bold mb-2 text-navy-700 dark:text-white">Appels</h2>
       <div style={customScrollbarStyle}>
         <table className="w-full table-fixed">
           <thead>
