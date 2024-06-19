@@ -13,6 +13,7 @@ import UserTable from '@/app/components/Organisms/UserTable';
 import UserStat from '@/app/components/Dashboard/UserStat';
 import MesAppels from '@/app/components/Dashboard/MesAppels';
 import Log from '@/app/components/Dashboard/Log';
+import DocumentPartages from '@/app/components/Dashboard/DocumentPartages';
 
 const Dashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -53,10 +54,13 @@ const Dashboard = () => {
         return <div>Mes documents content</div>;
       case 'calls':
         return (
-          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-            <MesAppels />
-            <Log />
-          </div>
+          <>
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+              <MesAppels />
+              <Log />
+            </div>
+            <DocumentPartages />
+          </>
         );
       case 'help':
         return <div>Centre d'aide content</div>;
