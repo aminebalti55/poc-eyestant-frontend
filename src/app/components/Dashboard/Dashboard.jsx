@@ -14,6 +14,7 @@ import UserStat from '@/app/components/Dashboard/UserStat';
 import MesAppels from '@/app/components/Dashboard/MesAppels';
 import Log from '@/app/components/Dashboard/Log';
 import DocumentPartages from '@/app/components/Dashboard/DocumentPartages';
+import MesDocuments from '@/app/components/Organisms/MesDocuments';
 
 const Dashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -50,8 +51,21 @@ const Dashboard = () => {
             <UserStat isDarkMode={isDarkMode} />
           </div>
         );
-      case 'documents':
-        return <div>Mes documents content</div>;
+        case 'documents':
+          return (
+            <div className="flex space-x-4">
+              <div className="w-2/3">
+                <MesDocuments isDarkMode={isDarkMode} title="Mes Documents" />
+              </div>
+              <div className="w-1/2">
+                <div className={`p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-dark-bg text-dark-text' : 'bg-white text-gray-800'}`}>
+                  <h2 className="text-lg font-semibold">Another Container</h2>
+                  <p>Content goes here...</p>
+                </div>
+              </div>
+            </div>
+          );
+        
       case 'calls':
         return (
           <>
